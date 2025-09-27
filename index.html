@@ -1,1 +1,285 @@
-<h1>Hello World</h1>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Full Page Background Video</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body,
+      html {
+        height: 100%;
+        overflow: hidden;
+        background-color: black;
+      }
+
+      #video-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+      }
+
+      #background-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        color: white;
+        text-align: center;
+        font-family: Arial, sans-serif;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+      }
+
+      .content.fade-in {
+        opacity: 1;
+      }
+
+      #birthday-svg {
+        filter: drop-shadow(-1px 0px 1px rgb(97, 100, 5));
+        max-width: 90vw;
+        height: auto;
+      }
+
+      #birthday-svg text {
+        text-shadow: -1px 0px 1px rgb(97, 100, 5);
+      }
+
+      /* Mobile responsiveness */
+      @media (max-width: 768px) {
+        #birthday-svg {
+          width: 95vw;
+          height: 100px;
+        }
+
+        .content {
+          padding: 10px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        #birthday-svg {
+          width: 98vw;
+          height: 90px;
+        }
+      }
+
+      .loading {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 1.5rem;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid #f6da85;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .loading-text {
+        font-family: "Cinzel", serif;
+        font-size: 1.2rem;
+        color: #f6da85;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <div class="loading-text">Loading video...</div>
+    </div>
+
+    <div id="video-container">
+      <video id="background-video" autoplay muted loop playsinline>
+        Your browser does not support the video tag.
+      </video>
+    </div>
+
+    <div class="content">
+      <svg
+        width="100%"
+        height="120"
+        xmlns="http://www.w3.org/2000/svg"
+        id="birthday-svg"
+        viewBox="0 0 400 120"
+      >
+        <defs>
+          <linearGradient id="grad2" y2="1" x2="1" x1="1" y1="0.1433">
+            <stop stop-color="rgb(255, 213, 127)" offset="0" />
+            <stop stop-color="rgb(179, 149, 0)" offset="0.4817" />
+            <stop stop-color="rgb(179, 149, 0)" offset="1" />
+          </linearGradient>
+        </defs>
+        <text
+          font-family="Cinzel, serif"
+          font-size="24"
+          fill="url(#grad2)"
+          font-weight="bold"
+          text-anchor="middle"
+          id="birthday-text"
+        >
+          <tspan x="200" y="35" id="line1">Happy Birthday</tspan>
+          <tspan x="200" y="65" id="line2">Ryan!</tspan>
+        </text>
+      </svg>
+    </div>
+
+    <script>
+      // Video URL prefix
+      const videoPrefix =
+        "https://pub-ac1c16a9d4784d3eaee35479446b71fd.r2.dev/";
+
+      // Function to generate random video filename
+      function getRandomVideoFilename() {
+        const randomNumber = Math.floor(Math.random() * 15) + 1; // 1 to 15
+        const paddedNumber = randomNumber.toString().padStart(2, "0"); // 01, 02, 03, etc.
+        return `${videoPrefix}Ryan${paddedNumber}.mp4`;
+      }
+
+      // Array of birthday messages in different languages with line breaks
+      const birthdayMessages = [
+        { line1: "Happy Birthday", line2: "Ryan!" }, // English
+        { line1: "Tillykke med", line2: "fødselsdagen Ryan!" }, // Danish
+        { line1: "Buon compleanno", line2: "Ryan!" }, // Italian
+        { line1: "Feliz aniversário", line2: "Ryan!" }, // Portuguese
+      ];
+
+      const video = document.getElementById("background-video");
+      const loading = document.getElementById("loading");
+      const loadingText = document.querySelector(".loading-text");
+      const line1Text = document.getElementById("line1");
+      const line2Text = document.getElementById("line2");
+      const svg = document.getElementById("birthday-svg");
+      const content = document.querySelector(".content");
+
+      // Function to get a random video URL
+      function getRandomVideo() {
+        return getRandomVideoFilename();
+      }
+
+      // Function to get a random birthday message
+      function getRandomBirthdayMessage() {
+        const randomIndex = Math.floor(Math.random() * birthdayMessages.length);
+        return birthdayMessages[randomIndex];
+      }
+
+      // Function to update the birthday text
+      function updateBirthdayText() {
+        const randomMessage = getRandomBirthdayMessage();
+        line1Text.textContent = randomMessage.line1;
+        line2Text.textContent = randomMessage.line2;
+
+        // Adjust font size based on text length for mobile
+        const maxLength = Math.max(
+          randomMessage.line1.length,
+          randomMessage.line2.length
+        );
+        let fontSize = 24;
+
+        if (maxLength > 15) {
+          fontSize = 20;
+        } else if (maxLength > 12) {
+          fontSize = 22;
+        }
+
+        // Update font size
+        const textElement = document.getElementById("birthday-text");
+        textElement.setAttribute("font-size", fontSize);
+      }
+
+      // Function to load and play a random video
+      function loadRandomVideo() {
+        const randomVideoUrl = getRandomVideo();
+
+        // Show loading indicator and hide content
+        loading.style.display = "block";
+        content.classList.remove("fade-in");
+
+        // Set video source
+        video.src = randomVideoUrl;
+
+        // Handle video load events
+        video.addEventListener("loadeddata", function () {
+          loading.style.display = "none";
+          video.play().catch(function (error) {
+            console.log("Autoplay was prevented:", error);
+            // If autoplay fails, show a play button or handle accordingly
+          });
+        });
+
+        // Fade in content when video starts playing
+        video.addEventListener("playing", function () {
+          content.classList.add("fade-in");
+        });
+
+        video.addEventListener("error", function () {
+          loadingText.textContent = "Error loading video. Trying another...";
+          // Try another video if current one fails
+          setTimeout(loadRandomVideo, 1000);
+        });
+      }
+
+      // Load a random video and set random text when the page loads
+      window.addEventListener("load", function () {
+        loadRandomVideo();
+        updateBirthdayText();
+      });
+
+      // Optional: Load a new random video when current one ends
+      video.addEventListener("ended", function () {
+        loadRandomVideo();
+        updateBirthdayText();
+      });
+
+      // Optional: Add click handler to change video and text manually
+      document.addEventListener("click", function () {
+        loadRandomVideo();
+        updateBirthdayText();
+      });
+    </script>
+  </body>
+</html>
